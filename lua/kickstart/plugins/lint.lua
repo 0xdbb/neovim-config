@@ -8,7 +8,7 @@ return {
       -- Define linters for specific file types
       lint.linters_by_ft = lint.linters_by_ft or {}
       lint.linters_by_ft['markdown'] = { 'markdownlint' } -- Use markdownlint for Markdown files
-      lint.linters_by_ft['json'] = { 'jsonlint' }         -- Use jsonlint for JSON files
+      lint.linters_by_ft['json'] = { 'jsonlint' } -- Use jsonlint for JSON files
 
       -- Default linter settings (commented sections kept from previous commands)
       -- However, note that this will enable a set of default linters,
@@ -32,7 +32,7 @@ return {
       -- lint.linters_by_ft['inko'] = nil
       -- lint.linters_by_ft['janet'] = nil
       -- lint.linters_by_ft['json'] = nil
-      -- lint.linters_by_ft['markdown'] = nil
+      lint.linters_by_ft['markdown'] = nil
       -- lint.linters_by_ft['rst'] = nil
       -- lint.linters_by_ft['ruby'] = nil
       -- lint.linters_by_ft['terraform'] = nil
@@ -49,4 +49,3 @@ return {
     end,
   },
 }
-

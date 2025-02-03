@@ -3,7 +3,7 @@ return {
   dependencies = {
     { 'hrsh7th/nvim-cmp' },
     { 'nvim-treesitter/nvim-treesitter' },
-    { 'ray-x/guihua.lua', run = 'cd lua/fzy && make' },
+    { 'ray-x/guihua.lua',               run = 'cd lua/fzy && make' },
     {
       'ray-x/go.nvim',
       event = { 'CmdlineEnter' },
@@ -47,10 +47,10 @@ return {
       callback = function(ev)
         -- CTRL/control keymaps
         vim.api.nvim_buf_set_keymap(0, 'n', '<C-i>', ':GoImports<CR>', {})
-        vim.api.nvim_buf_set_keymap(0, 'n', '<C-b>', ':GoBuild %:h<CR>', {})
+        -- vim.api.nvim_buf_set_keymap(0, 'n', '<S-b>', ':GoBuild %:h<CR>', {})
         vim.api.nvim_buf_set_keymap(0, 'n', '<C-t>', ':GoTestPkg<CR>', {})
         vim.api.nvim_buf_set_keymap(0, 'n', '<C-c>', ':GoCoverage -p<CR>', {})
-        vim.api.nvim_buf_set_keymap(0, 'n', '<C-r>', ':GoRun<CR>', {})
+        -- vim.api.nvim_buf_set_keymap(0, 'n', '<C-r>', ':GoRun<CR>', {})
       end,
       group = vim.api.nvim_create_augroup('go_autocommands', { clear = true }),
     })

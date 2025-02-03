@@ -11,7 +11,7 @@ return {
   },
   cmd = 'Neotree',
   keys = {
-    { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '\\',         ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
     { '<leader>ee', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
@@ -56,12 +56,12 @@ return {
         },
       },
       filtered_items = {
-        visible = true, -- Show all hidden files by default
+        visible = true,        -- Show all hidden files by default
         hide_dotfiles = false, -- Show dotfiles
-        never_show = { -- Add exceptions here
-          '.git', -- Hide .git directory
-          '.DS_Store', -- Hide .DS_Store (macOS-specific)
-          'node_modules', -- Hide node_modules directory
+        never_show = {         -- Add exceptions here
+          '.git',              -- Hide .git directory
+          '.DS_Store',         -- Hide .DS_Store (macOS-specific)
+          'node_modules',      -- Hide node_modules directory
         },
       },
     },

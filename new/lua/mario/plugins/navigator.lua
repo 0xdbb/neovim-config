@@ -39,7 +39,7 @@ return {
 
         vim.api.nvim_create_autocmd("FileType", {
             pattern = {"go"},
-            callback = function(ev)
+            callback = function()
                 -- CTRL/control keymaps
                 vim.api
                     .nvim_buf_set_keymap(0, "n", "<C-i>", ":GoImports<CR>", {})

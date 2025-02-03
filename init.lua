@@ -93,6 +93,8 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+vim.opt.termguicolors = true
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -110,13 +112,25 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
--- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
+vim.cmd 'iabbrev cw Console.WriteLine();'
+
+vim.cmd 'iabbrev fmtp fmt.Println()'
+
+vim.cmd 'iabbrev adn and'
+
+vim.cmd 'iabbrev prt fmt.Println'
+
+vim.cmd 'iabbrev teh the'
+
+vim.cmd 'iabbrev waht what'
+
+vim.cmd 'iabbrev @@ dennisboachie9@gmail.com'
+
+vim.cmd 'iabbrev dbb Dennis Boachie Boateng'
+
+vim.cmd [[
+iabbrev rsc const MyComponent = () => {<CR>return (<CR><Tab><div><CR><Tab><Tab>{/* Your code here */}<CR><Tab></div><CR>);<CR>};
+]]
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -246,9 +260,9 @@ require('lazy').setup({
           },
         },
         color_icons = true, -- Globally enable different highlight colors per icon
-        default = true, -- Globally enable default icons
-        strict = true, -- Enable "strict" icon selection
-        variant = 'dark', -- Set variant manually (light or dark)
+        default = true,     -- Globally enable default icons
+        strict = true,      -- Enable "strict" icon selection
+        variant = 'dark',   -- Set variant manually (light or dark)
         override_by_filename = {
           ['.gitignore'] = {
             icon = '',
@@ -274,32 +288,86 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'nvim-neorg/neorg',
+    lazy = false,  -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = '*', -- Pin Neorg to the latest stable release
+    config = true,
+  },
+  {
+    'github/copilot.vim',
+    config = function()
+      -- Optional: Configure Copilot if needed
+      vim.g.copilot_no_tab_map = false -- Disable default tab mapping
+      vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+      -- disable .env files
+      vim.g.copilot_disabled_filetypes = { 'env' }
+    end,
+  },
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false, -- Recommended
+    -- ft = "markdown" -- If you decide to lazy-load anyway
+
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
+  },
+
+  {
+    'kndndrj/nvim-dbee',
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+    },
+    build = function()
+      -- Install tries to automatically detect the install method.
+      -- if it fails, try calling it with one of these parameters:
+      --    "curl", "wget", "bitsadmin", "go"
+      require('dbee').install()
+    end,
+    config = function()
+      require('dbee').setup( --[[optional config]])
+    end,
+  },
 
   {
     'akinsho/toggleterm.nvim',
     version = '*',
     config = function()
+      -- ToggleTerm Setup
       require('toggleterm').setup {
-        open_mapping = [[<S-Space>]], -- Use Shift + Space to open the terminal
+        open_mapping = [[<S-Space>]], -- Open terminal with Shift+Space
         shade_filetypes = {},
-        insert_mappings = true,
-        terminal_mappings = true,
-        shade_terminal = true,
+        insert_mappings = true,       -- Allow mappings in insert mode
+        terminal_mappings = true,     -- Allow mappings in terminal mode
+        shade_terminals = true,       -- Corrected from `shade_terminal`
         persist_size = true,
-        direction = 'horizontal', -- Use 'horizontal', 'vertical', or 'tab'
+        direction = 'vertical',       -- Default terminal direction
         close_on_exit = true,
-        shell = vim.o.shell, -- Set the shell you want to use
+        shell = vim.o.shell,
       }
 
-      -- Set key mapping for opening the terminal
-      local map = vim.api.nvim_set_keymap
+      -- Import Terminal class
+      local Terminal = require('toggleterm.terminal').Terminal
+
+      -- Define terminal instances
+      local float_term = Terminal:new { cmd = 'bash', hidden = true, direction = 'float' }
+      local horizontal_term = Terminal:new { cmd = 'bash', hidden = true, direction = 'horizontal' }
+      local vertical_term = Terminal:new { cmd = 'bash', hidden = true, direction = 'vertical' }
+
+      -- Map keys to toggle specific terminals
+      vim.api.nvim_set_keymap('n', '<leader>tf', '<cmd>lua float_term:toggle()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>th', '<cmd>lua horizontal_term:toggle()<CR>',
+        { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>tv', '<cmd>lua vertical_term:toggle()<CR>', { noremap = true, silent = true })
+
+      -- Key mapping for generic toggle
       local opts = { noremap = true, silent = true }
-
-      -- Leader key mapping for opening the terminal
-      map('n', '<leader>tt', '<Cmd>ToggleTerm<CR>', opts) -- Open terminal with <leader>tt
-
-      -- Close terminal with 'q' when in terminal mode
-      map('t', 'q', [[<C-\><C-n>:ToggleTerm<CR>]], opts) -- Close terminal with 'q'
+      vim.api.nvim_set_keymap('n', '<leader>tt', '<Cmd>ToggleTerm<CR>', opts)
+      vim.api.nvim_set_keymap('n', '<leader>n', '<Cmd>2ToggleTerm<CR>', opts)
+      vim.api.nvim_set_keymap('n', '<leader>m', '<Cmd>3ToggleTerm<CR>', opts)
+      vim.api.nvim_set_keymap('t', '<leader>q', [[<C-\><C-n>:ToggleTerm<CR>]], opts) -- Close terminal from terminal mode
     end,
   },
 
@@ -315,6 +383,19 @@ require('lazy').setup({
   --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim',  -- required
+      'sindrets/diffview.nvim', -- optional - Diff integration
+
+      -- Only one of these is needed.
+      'nvim-telescope/telescope.nvim', -- optional
+      'ibhagwan/fzf-lua',              -- optional
+    },
+    config = true,
+  },
+  'mg979/vim-visual-multi',
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -327,6 +408,14 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'karb94/neoscroll.nvim',
+    config = function()
+      require('neoscroll').setup {}
+    end,
+  },
+
+  { 'norcalli/nvim-colorizer.lua' },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -343,7 +432,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  { -- Useful plugin to show you pending keybinds.
+  {                     -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -386,7 +475,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',     mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
@@ -428,7 +517,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',                enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -454,34 +543,40 @@ require('lazy').setup({
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
+        --  All the info you're looking for is in :help telescope.setup()
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {
+          file_ignore_patterns = { '^.git/' }, -- Optionally ignore the .git folder
+          find_command = { 'fd', '--type', 'f', '--hidden', '--follow' },
+          -- mappings = {
+          -- i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          -- },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
           },
           fzf = {
-            fuzzy = true, -- false will only do exact matching
+            fuzzy = true,                   -- false will only do exact matching
             override_generic_sorter = true, -- override the generic sorter
-            override_file_sorter = true, -- override the file sorter
-            case_mode = 'smart_case', -- or "ignore_case" or "respect_case"
+            override_file_sorter = true,    -- override the file sorter
+            case_mode = 'smart_case',       -- or "ignore_case" or "respect_case"
             -- the default case_mode is "smart_case"
           },
           file_browser = {
-            path = '%:p:h', -- open from within the folder of your current buffer
-            display_stat = false, -- don't show file stat
-            grouped = true, -- group initial sorting by directories and then files
-            hidden = true, -- show hidden files
-            hide_parent_dir = true, -- hide `../` in the file browser
-            hijack_netrw = true, -- use telescope file browser when opening directory paths
-            prompt_path = true, -- show the current relative path from cwd as the prompt prefix
-            use_fd = true, -- use `fd` instead of plenary, make sure to install `fd`
+            path = '%:p:h',         -- open from within the folder of your current buffer
+            display_stat = false,   -- don't show file stat
+            grouped = true,         -- group initial sorting by directories and then files
+            hidden = true,          -- show hidden files
+            hide_parent_dir = true, -- hide ../ in the file browser
+            hijack_netrw = true,    -- use telescope file browser when opening directory paths
+            prompt_path = true,     -- show the current relative path from cwd as the prompt prefix
+            use_fd = true,          -- use fd instead of plenary, make sure to install fd
           },
         },
       }
@@ -509,8 +604,8 @@ require('lazy').setup({
 
       map('n', '-', ':Telescope file_browser<CR>')
 
-      map('n', '<leader>ff', builtin.find_files, opts) -- Lists files in your current working directory, respects .gitignore
-      map('n', '<leader>sy', builtin.treesitter, opts) -- Lists tree-sitter symbols
+      map('n', '<leader>ff', builtin.find_files, opts)    -- Lists files in your current working directory, respects .gitignore
+      map('n', '<leader>sy', builtin.treesitter, opts)    -- Lists tree-sitter symbols
       map('n', '<leader>sp', builtin.spell_suggest, opts) -- Lists spell options
       --
       -- Slightly advanced example of overriding default behavior and theme
@@ -551,7 +646,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'Bilal2453/luvit-meta', lazy = true },
+  { 'Bilal2453/luvit-meta',     lazy = true },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -563,7 +658,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -706,7 +801,7 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
         gopls = {},
         pyright = {},
         -- rust_analyzer = {},
@@ -718,10 +813,13 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
         csharp_ls = {},
+        tailwindcss = {},
 
         html = {},
+        emmet_language_server = {},
         ast_grep = {},
         sqls = {},
+        templ = {},
         --
 
         lua_ls = {
@@ -791,7 +889,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, sql = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
           lsp_format_opt = 'never'
@@ -991,13 +1089,13 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+    main = 'nvim-treesitter.configs',                    -- Sets main module to use for opts
     dependencies = {
       { 'nvim-treesitter/nvim-treesitter-textobjects' }, -- Syntax aware text-objects
-      -- {
-      --   'nvim-treesitter/nvim-treesitter-context', -- Show code context
-      --   opts = { enable = true, mode = 'topline', line_numbers = true },
-      -- },
+      {
+        'nvim-treesitter/nvim-treesitter-context',       -- Show code context
+        opts = { enable = true, mode = 'topline', line_numbers = true },
+      },
     },
 
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
@@ -1020,6 +1118,7 @@ require('lazy').setup({
         'query',
         'vim',
         'vimdoc',
+        'yaml',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
@@ -1083,6 +1182,14 @@ require('lazy').setup({
     },
   },
 })
+
+-- Sync clipboard between OS and Neovim.
+--  Schedule the setting after `UiEnter` because it can increase startup-time.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+vim.schedule(function()
+  vim.opt.clipboard = 'unnamedplus'
+end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
